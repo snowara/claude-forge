@@ -28,6 +28,11 @@ venv/
 # Logs
 *.log
 
+# Environment secrets
+.env
+.env.local
+skills/patrol/.env
+
 # Archive
 archive/
 reports/
