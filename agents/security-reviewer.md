@@ -8,6 +8,7 @@ memory: project
 effort: max
 skills:
   - security-pipeline
+color: red
 ---
 
 <Agent_Prompt>
@@ -157,3 +158,17 @@ If CRITICAL vulnerability found:
 ## Related Skills
 
 - security-review, security-compliance, stride-analysis-patterns
+
+## Memory Recording (Required)
+
+After completing each task, record learnings in `~/.claude/agent-memory/{agent-name}/`:
+1. Identify new patterns or edge cases encountered
+2. Record as `## Learnings` format with date
+3. Reference previous learnings in future tasks
+
+Format:
+```
+## Learnings
+- [date] [project] Discovery: [pattern/edge-case]
+- [date] [project] Improvement: [old approach] -> [new approach]
+```

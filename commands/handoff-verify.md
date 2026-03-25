@@ -391,7 +391,9 @@ rm .claude/handoff.md  # 존재 시
   Build       PASS
   Test        PASS (42 passed, 0 failed)
 
-다음 단계: /commit-push-pr --merge --notify
+다음 단계:
+  1. /commit-push-pr --merge --notify
+  2. /sync (커밋 후 문서 동기화 권장)
 ════════════════════════════════════════════════════════════════
 ```
 
@@ -403,7 +405,10 @@ rm .claude/handoff.md  # 존재 시
   effort: [level]
 ════════════════════════════════════════════════════════════════
 
-모든 검증 통과. 다음 단계: /commit-push-pr --merge --notify
+모든 검증 통과.
+다음 단계:
+  1. /commit-push-pr --merge --notify
+  2. /sync (커밋 후 문서 동기화 권장)
 ════════════════════════════════════════════════════════════════
 ```
 

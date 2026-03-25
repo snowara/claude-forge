@@ -1,45 +1,93 @@
 # Golden Principles
 
-> 7 core principles for writing clean, maintainable code.
+> 12 core principles for writing clean, maintainable code.
 
-## 1. 불변성 (Immutability)
+## 1. Immutability
 
-**왜?** 변이(mutation)는 버그의 온상. 어디서 값이 바뀌었는지 추적이 불가능해진다.
+**Why?** Mutation is a breeding ground for bugs. It's impossible to track where a value changed.
 
-**어떻게?** spread operator로 새 객체를 만들어라. 원본을 절대 수정하지 마라.
+**How?** Use spread operators to create new objects. Never modify the original.
 
-## 2. 시크릿 환경 변수화
+## 2. Secrets in Environment Variables
 
-**왜?** 하드코딩된 시크릿은 커밋 한 번으로 영구 노출된다. git history에서 완전 삭제는 사실상 불가능.
+Never hardcode secrets. Use `process.env` only; throw immediately if unset.
 
-**어떻게?** `process.env`로만 접근하고, 미설정 시 즉시 throw하라.
+## 3. Test First (TDD)
 
-## 3. 테스트 먼저 (TDD)
+**Why?** Writing tests after implementation leads to "tests that only pass." You miss failure cases.
 
-**왜?** 구현 후 테스트를 짜면 "통과하는 테스트"만 만들게 된다. 실패 케이스를 놓친다.
+**How?** RED (failing test) -> GREEN (minimal implementation) -> IMPROVE (refactoring). 80%+ coverage.
 
-**어떻게?** RED(실패 테스트) -> GREEN(최소 구현) -> IMPROVE(리팩토링). 커버리지 80% 이상.
+## 4. Conclusion First, Reasoning Second
 
-## 4. 결론 먼저, 근거 나중
+Lead with the conclusion in the first sentence. Add "because..." after.
 
-**왜?** 긴 설명 후 결론이 나오면 독자가 핵심을 놓친다. 시간도 낭비.
+## 5. Small Files, Small Functions
 
-**어떻게?** 첫 문장에 결론을 쓰고, 그 다음에 "왜냐하면"을 붙여라.
+File: 800 lines max. Function: 50 lines max. Nesting: 4 levels max. Split if exceeded.
 
-## 5. 작은 파일, 작은 함수
+## 6. Validate at System Boundaries
 
-**왜?** 800줄짜리 파일은 누구도 전체를 파악할 수 없다. 변경 영향 범위도 커진다.
+Trust internal code, but validate user input and external API responses (e.g., zod schemas, parameterized queries).
 
-**어떻게?** 파일 800줄, 함수 50줄, 중첩 4단계가 한계. 넘으면 분리하라.
+## 7. Explain with Analogies
 
-## 6. 시스템 경계에서 검증
+Everyday analogy first (1-2 sentences), then technical explanation.
 
-**왜?** 내부 코드는 신뢰해도 되지만, 사용자 입력과 외부 API 응답은 신뢰할 수 없다.
+## 8. Context 50% Rule
 
-**어떻게?** zod 스키마로 입력을 검증하고, 파라미터화된 쿼리로 SQL 인젝션을 차단하라.
+Complete work within 50% of the context window. Split large tasks into new sessions.
 
-## 7. 비유로 설명
+## 9. HARD-GATE: No Coding Without Design
 
-**왜?** 추상적 기술 개념은 비유 없이 전달하면 이해율이 급락한다.
+Run `/plan` first if any of these apply: new feature (3+ files), architecture change, API endpoint change, DB schema change. No code until the user approves the plan. Exception: simple fixes (1-2 files, typo/bug patches).
 
-**어떻게?** 일상 비유 1-2문장 먼저 -> 기술적 설명 순서로 말하라.
+## 10. Evidence-Based Completion
+
+**Why?** "It's done" without evidence is a lie. LLMs tend to declare completion without execution.
+
+**How?** Before claiming completion:
+1. Show test results (pass/fail count, coverage)
+2. Confirm build success by running it
+3. Check requirements against a checklist with evidence
+
+**Banned**: "This should work", "No issues expected" — speculative completion claims
+**Required**: "12 tests passed", "Build success (0 errors)" — execution evidence
+
+## 11. SDD Review Enforcement
+
+When using subagent-driven development: spec compliance first, issues found = not done, "close enough" doesn't count.
+
+## 12. Surgical Changes
+
+**Why?** LLMs fix one bug but "improve" adjacent formatting, comments, and type hints. Reviewers can't find the actual change.
+
+**How?** Only change what was requested. Every changed line must trace directly to the user's request.
+- Don't "improve" adjacent code, comments, or formatting
+- Match existing style, even if you'd do it differently
+- Unrelated dead code: mention it, don't delete it
+- Only clean up orphans (unused imports, etc.) that YOUR changes created
+
+---
+
+## Anti-Rationalization (These excuses don't work)
+
+| Principle | Excuse | Reality |
+|-----------|--------|---------|
+| TDD | "Too simple to need tests" | Simple code breaks too. Tests take 30 seconds |
+| TDD | "I'll add tests later" | Tests written later only cover happy paths |
+| TDD | "TDD is slow" | TDD is faster than debugging |
+| Immutability | "Need mutation for performance" | Only after profiling proves it |
+| Secrets | "It's just the test environment" | Test secrets in commits are permanently exposed |
+| File size | "It's small enough" | Review for splitting at 400+ lines |
+| Boundary | "Internal function, no validation needed" | System boundary decisions belong to the designer |
+| Analogy | "Unnecessary for technical audiences" | Project rule. No exceptions |
+| Conclusion | "Hard to conclude without context" | One-line conclusion first, context after |
+| Context | "Still have room left" | Over 50% = new session. No exceptions |
+| HARD-GATE | "Quick fix, no plan needed" | 3+ files changed = plan first |
+| Evidence | "It already works fine" | Claims without evidence are false. Show execution results |
+| SDD | "Skip review, move to next task" | Unreviewed = incomplete. No exceptions |
+| Ralph Loop | "Let me just try one more approach" | Stop. Plan first, then execute once |
+| /simplify | "The complexity is necessary" | Run /simplify. If it finds reduction, it wasn't necessary |
+| Surgical | "While I'm here, let me clean up" | Only change requested lines. Cleanup is a separate request |
+| Simplicity | "Need abstraction for extensibility" | Only what's needed now. Abstract when repetition hits 3+ times |

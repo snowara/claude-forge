@@ -377,7 +377,70 @@ verify() {
     return $errors
 }
 
-# 10. Install work tracker (Supabase sync)
+# 10. Write forge metadata
+write_meta() {
+    echo ""
+    echo "Writing forge metadata..."
+
+    # install_mode 판단: agents가 symlink이면 symlink, 아니면 copy
+    local install_mode="symlink"
+    if [ ! -L "$CLAUDE_DIR/agents" ] && [ -d "$CLAUDE_DIR/agents" ]; then
+        install_mode="copy"
+    fi
+
+    # plugin.json에서 버전 읽기
+    local version="1.0.0"
+    if [ -f "$REPO_DIR/.claude-plugin/plugin.json" ] && command -v jq >/dev/null; then
+        version=$(jq -r '.version // "1.0.0"' "$REPO_DIR/.claude-plugin/plugin.json")
+    fi
+
+    # git 정보
+    local git_commit=""
+    local remote_url=""
+    if command -v git >/dev/null && [ -d "$REPO_DIR/.git" ]; then
+        git_commit=$(cd "$REPO_DIR" && git rev-parse --short HEAD 2>/dev/null || echo "")
+        remote_url=$(cd "$REPO_DIR" && git remote get-url origin 2>/dev/null || echo "")
+    fi
+
+    local now
+    now=$(date +"%Y-%m-%dT%H:%M:%S%z" 2>/dev/null || date +"%Y-%m-%dT%H:%M:%S")
+
+    # 기존 메타파일이 있으면 installed_at 보존
+    local installed_at="$now"
+    if [ -f "$CLAUDE_DIR/.forge-meta.json" ] && command -v jq >/dev/null; then
+        local prev_installed
+        prev_installed=$(jq -r '.installed_at // ""' "$CLAUDE_DIR/.forge-meta.json")
+        if [ -n "$prev_installed" ] && [ "$prev_installed" != "null" ]; then
+            installed_at="$prev_installed"
+        fi
+    fi
+
+    # jq로 안전하게 JSON 생성 (경로 인젝션 방지)
+    jq -n \
+      --arg repo_path "$REPO_DIR" \
+      --arg install_mode "$install_mode" \
+      --arg installed_at "$installed_at" \
+      --arg updated_at "$now" \
+      --arg version "$version" \
+      --arg git_commit "$git_commit" \
+      --arg remote_url "$remote_url" \
+      --arg platform "$PLATFORM" \
+      '{
+        repo_path: $repo_path,
+        install_mode: $install_mode,
+        installed_at: $installed_at,
+        updated_at: $updated_at,
+        version: $version,
+        git_commit: $git_commit,
+        remote_url: $remote_url,
+        platform: $platform
+      }' > "$CLAUDE_DIR/.forge-meta.json"
+
+    chmod 600 "$CLAUDE_DIR/.forge-meta.json"
+    echo -e "  ${GREEN}✓${NC} .forge-meta.json"
+}
+
+# 11. Install work tracker (Supabase sync)
 install_work_tracker() {
     local wt_script="$REPO_DIR/setup/work-tracker-install.sh"
     if [ -f "$wt_script" ]; then
@@ -403,6 +466,9 @@ main() {
     if verify; then
         echo ""
         echo -e "${GREEN}Symlinks created successfully!${NC}"
+
+        # Write forge metadata
+        write_meta
 
         # Setup shell aliases
         setup_shell_aliases

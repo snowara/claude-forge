@@ -20,9 +20,9 @@
 <p align="center">
   <a href="#-quick-start">Quick Start</a> &bull;
   <a href="#-development-workflows">Workflows</a> &bull;
-  <a href="#-whats-inside">What's Inside</a> &bull;
-  <a href="#-installation-guide">Installation</a> &bull;
-  <a href="#-architecture">Architecture</a> &bull;
+  <a href="#-whats-inside-claude-forge">What's Inside</a> &bull;
+  <a href="#-claude-forge-installation-guide">Installation</a> &bull;
+  <a href="#-claude-forge-architecture">Architecture</a> &bull;
   <a href="#-customization">Customization</a> &bull;
   <a href="README.ko.md">한국어</a>
 </p>
@@ -31,13 +31,40 @@
 
 ## What is Claude Forge?
 
-Claude Forge transforms **Claude Code** from a basic CLI into a **full-featured development environment**. One install gives you 11 specialized agents, 36 slash commands, 15 skill workflows, 14 automation hooks, and 8 rule files -- all pre-wired and ready to go.
+Claude Forge is an open-source development environment for Claude Code that provides 11 specialized agents, 40 slash commands, 15 skill workflows, and 15 automation hooks. Often described as "oh-my-zsh for Claude Code", it transforms Claude Code from a basic CLI into a full-featured development environment. One install gives you agents, commands, skills, hooks, and 9 rule files -- all pre-wired and ready to go.
 
 > Think of it as **oh-my-zsh for Claude Code**: the same way oh-my-zsh enhances your terminal, Claude Forge supercharges your AI coding assistant.
 
 ---
 
 ## ⚡ Quick Start
+
+### Install as Plugin (Recommended)
+
+Claude Forge is available on the **Anthropic Official Plugin Marketplace** and can be installed directly from Claude Code:
+
+```bash
+# Option A: Install from Official Marketplace (after approval)
+/plugin install claude-forge@claude-plugins-official
+
+# Option B: Install from Claude Forge Marketplace
+/plugin marketplace add sangrokjung/claude-forge
+/plugin install claude-forge@claude-forge
+
+# Option C: Install directly from GitHub
+claude plugin install github:sangrokjung/claude-forge
+```
+
+To update:
+```bash
+/plugin marketplace update claude-forge
+```
+
+> **Note**: Claude Forge has been submitted to the [Anthropic Official Plugin Directory](https://github.com/anthropics/claude-plugins-official) and is pending review. In the meantime, use Option B or C above.
+
+### Install via Git Clone
+
+For development or customization, clone the repository:
 
 ```bash
 # 1. Clone
@@ -53,6 +80,27 @@ claude
 
 `install.sh` symlinks everything to `~/.claude/`, so `git pull` updates instantly.
 
+> If you find Claude Forge useful, please consider giving it a [star](https://github.com/sangrokjung/claude-forge/stargazers) -- it helps others discover this project.
+
+### What's New in v2.2
+
+| Change | Description |
+|:-------|:------------|
+| **Surgical Changes Principle** | New 12th golden principle: only change what was requested. No drive-by refactoring, style drift, or adjacent "improvements". Inspired by [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls. |
+| **State Assumptions Before Coding** | New interaction rule: surface assumptions and present alternatives before implementing ambiguous requirements -- don't guess silently. |
+| **Anti-Rationalization Expansion** | Two new entries block common LLM excuses: "while I'm here, let me clean up" and "need abstraction for extensibility". |
+
+<details>
+<summary><strong>v2.1 Changes</strong></summary>
+
+| Change | Description |
+|:-------|:------------|
+| **Verification Rules** | New `verification.md` rule enforces evidence-based completion -- no claims without fresh test/build output. |
+| **Agent Self-Evolution** | Core 5 agents (planner, architect, code-reviewer, security-reviewer, tdd-guide) now record learnings in `~/.claude/agent-memory/` after each task. |
+| **Hook Sync** | Added `forge-update-check.sh` (session start update notification) and `observe.sh` (continuous learning observation). |
+
+</details>
+
 ### New here?
 
 If you're new to development or Claude Code, start with these:
@@ -60,7 +108,7 @@ If you're new to development or Claude Code, start with these:
 | Step | What to do |
 |:-----|:-----------|
 | 1 | Run `/guide` after install -- an interactive 3-minute tour |
-| 2 | Read [First Steps](docs/FIRST-STEPS.md) -- glossary + TOP 5 commands |
+| 2 | Read [First Steps](docs/FIRST-STEPS.md) -- glossary + TOP 6 commands |
 | 3 | Browse [Workflow Recipes](docs/WORKFLOW-RECIPES.md) -- 5 copy-paste scenarios |
 
 Or just type `/auto login page` and let Claude Forge handle the entire plan-to-PR pipeline for you.
@@ -80,7 +128,7 @@ Real-world workflows that chain commands, agents, and skills together.
 Build new features with a plan-first, test-first approach:
 
 ```
-/plan → /tdd → /code-review → /handoff-verify → /commit-push-pr
+/plan → /tdd → /code-review → /handoff-verify → /commit-push-pr → /sync
 ```
 
 ```mermaid
@@ -89,12 +137,14 @@ graph LR
     T --> CR["/code-review<br><small>Quality & security check</small>"]
     CR --> HV["/handoff-verify<br><small>Fresh-context validation</small>"]
     HV --> CPR["/commit-push-pr<br><small>Commit, push, PR & merge</small>"]
+    CPR --> S["/sync<br><small>Sync project docs</small>"]
 
     style P fill:#533483,stroke:#fff,color:#fff
     style T fill:#0f3460,stroke:#fff,color:#fff
     style CR fill:#0f3460,stroke:#fff,color:#fff
     style HV fill:#e94560,stroke:#fff,color:#fff
     style CPR fill:#1a1a2e,stroke:#fff,color:#fff
+    style S fill:#16213e,stroke:#fff,color:#fff
 ```
 
 | Step | What happens |
@@ -104,13 +154,14 @@ graph LR
 | `/code-review` | Security + quality check on the code you just wrote. |
 | `/handoff-verify` | Auto-verify build/test/lint all at once. |
 | `/commit-push-pr` | Commit, push, create PR, and optionally merge -- all in one. |
+| `/sync` | Sync project docs (prompt_plan.md, spec.md, CLAUDE.md, rules). |
 
 ### Bug Fix
 
 Fast turnaround for bug fixes with automatic retry:
 
 ```
-/explore → /tdd → /verify-loop → /quick-commit
+/explore → /tdd → /verify-loop → /quick-commit → /sync
 ```
 
 | Step | What happens |
@@ -119,6 +170,7 @@ Fast turnaround for bug fixes with automatic retry:
 | `/tdd` | Write a test that reproduces the bug, then fix it. |
 | `/verify-loop` | Auto-retry build/lint/test up to 3 times with auto-fix on failure. |
 | `/quick-commit` | Fast commit for simple, well-tested changes. |
+| `/sync` | Sync project docs after commit. |
 
 ### Security Audit
 
@@ -154,7 +206,23 @@ Parallel multi-agent execution for complex tasks:
 
 ---
 
-## 📦 What's Inside
+## Why Claude Forge?
+
+Most developers either use Claude Code with no customization or spend hours assembling individual configs. Claude Forge gives you a production-ready setup in 5 minutes.
+
+| Feature | Claude Forge | Basic `.claude/` Setup | Individual Plugins |
+|:--------|:------------|:-----------------------|:-------------------|
+| **Agents** | 11 pre-configured (Opus + Sonnet) | Manual setup required | Varies by plugin |
+| **Slash Commands** | 40 ready-to-use | None | Per-plugin basis |
+| **Skill Workflows** | 15 multi-step pipelines | None | Per-plugin basis |
+| **Security** | 6-layer automated hooks | None by default | Per-plugin basis |
+| **Installation** | 5 min, one command | Hours of manual config | Per-plugin install |
+| **Updates** | `git pull` (instant) | Manual per-file | Per-plugin update |
+| **Workflow Integration** | End-to-end pipelines (plan to PR) | Disconnected tools | Not integrated |
+
+---
+
+## 📦 What's Inside Claude Forge
 
 <p align="center">
   <img src="docs/features-grid.jpg" alt="Claude Forge Components" width="720">
@@ -163,15 +231,15 @@ Parallel multi-agent execution for complex tasks:
 | Category | Count | Highlights |
 |:--------:|:-----:|:-----------|
 | **Agents** | 11 | `planner` `architect` `code-reviewer` `security-reviewer` `tdd-guide` `database-reviewer` + 5 more |
-| **Commands** | 36 | `/commit-push-pr` `/handoff-verify` `/explore` `/tdd` `/plan` `/orchestrate` `/security-review` ... |
+| **Commands** | 40 | `/commit-push-pr` `/handoff-verify` `/explore` `/tdd` `/plan` `/orchestrate` `/security-review` ... |
 | **Skills** | 15 | `build-system` `security-pipeline` `eval-harness` `team-orchestrator` `session-wrap` ... |
-| **Hooks** | 14 | Secret filtering, remote command guard, DB protection, security auto-trigger, rate limiting ... |
-| **Rules** | 8 | `coding-style` `security` `git-workflow` `golden-principles` `agents` `interaction` ... |
+| **Hooks** | 15 | Secret filtering, remote command guard, DB protection, security auto-trigger, rate limiting ... |
+| **Rules** | 9 | `coding-style` `security` `git-workflow` `golden-principles` `agents` `interaction` `verification` ... |
 | **MCP Servers** | 6 | `context7` `memory` `exa` `github` `fetch` `jina-reader` |
 
 ---
 
-## 📥 Installation Guide
+## 📥 Claude Forge Installation Guide
 
 ### Prerequisites
 
@@ -234,7 +302,7 @@ vim ~/.claude/settings.local.json
 
 ---
 
-## 🏗 Architecture
+## 🏗 Claude Forge Architecture
 
 <p align="center">
   <img src="docs/architecture.jpg" alt="Symlink Architecture" width="720">
@@ -244,10 +312,10 @@ vim ~/.claude/settings.local.json
 graph TB
     subgraph REPO["claude-forge (git repo)"]
         A["agents/ (11)"]
-        C["commands/ (36)"]
+        C["commands/ (40)"]
         S["skills/ (15)"]
-        H["hooks/ (14)"]
-        R["rules/ (8)"]
+        H["hooks/ (15)"]
+        R["rules/ (9)"]
         SC["scripts/"]
         CC["cc-chips/"]
         K["knowledge/"]
@@ -288,12 +356,12 @@ claude-forge/
   ├── agents/               Agent definitions (11 .md files)
   ├── cc-chips/             Status bar submodule
   ├── cc-chips-custom/      Custom status bar overlay
-  ├── commands/             Slash commands (28 .md + 8 SKILL dirs)
+  ├── commands/             Slash commands (32 .md + 8 SKILL dirs)
   ├── docs/                 Screenshots, diagrams
-  ├── hooks/                Event-driven shell scripts (14)
+  ├── hooks/                Event-driven shell scripts (15)
   ├── knowledge/            Knowledge base entries
   ├── reference/            Reference documentation
-  ├── rules/                Auto-loaded rule files (8)
+  ├── rules/                Auto-loaded rule files (9)
   ├── scripts/              Utility scripts
   ├── setup/                Installation guides + templates
   ├── skills/               Multi-step skill workflows (15)
@@ -310,7 +378,82 @@ claude-forge/
 
 ---
 
-## 🛡 Automation Hooks
+## 🔀 Agent Router System
+
+The Agent Router is a **forced delegation system** that ensures specialized agents handle their domain tasks instead of Claude doing everything directly. Without this, Claude defaults to handling all tasks itself -- even when a specialized agent would produce better results.
+
+### How It Works
+
+```mermaid
+graph LR
+    U["User Message"] --> SP["using-superpowers<br><small>1% rule: MUST check skills</small>"]
+    SP --> AR["agent-router<br><small>Domain match check</small>"]
+    AR -->|"Match found"| A["Agent Tool<br><small>Spawn specialist</small>"]
+    AR -->|"No match"| D["Direct Response"]
+    A --> R["Specialist Result"]
+
+    style U fill:#1a1a2e,stroke:#fff,color:#fff
+    style SP fill:#e94560,stroke:#fff,color:#fff
+    style AR fill:#533483,stroke:#fff,color:#fff
+    style A fill:#0f3460,stroke:#fff,color:#fff
+    style D fill:#16213e,stroke:#fff,color:#fff
+    style R fill:#0f3460,stroke:#fff,color:#fff
+```
+
+### The Forcing Chain
+
+| Layer | Mechanism | Role |
+|:------|:----------|:-----|
+| **system-reminder** | Lists `agent-router` skill description every turn | Visibility |
+| **using-superpowers** | "1% chance a skill applies? You MUST invoke it" | Forcing |
+| **agent-router** | Routing table: keyword → agent mapping | Delegation |
+| **agents-v2.md** | Priority rules and team management | Orchestration |
+
+### Routing Table (33 Agents)
+
+| Domain | Keywords | Agent |
+|:-------|:---------|:------|
+| Planning | implementation plan, complex feature | `planner` |
+| Code Review | code review, review this | `code-reviewer` |
+| Architecture | architecture, tech debt, scalability | `architect` |
+| TDD | test first, TDD, red-green | `tdd-guide` |
+| Legal | contract, NDA, law, court ruling | `contract-legal` |
+| Finance | tax, accounting, VAT, income tax | `financial-accountant` |
+| Patent | patent, invention, trademark, IP | `patent-attorney` |
+| SEO | SEO, GEO, AEO, search ranking | `seo-geo-aeo-strategist` |
+| Strategy | product strategy, business plan, roadmap | `product-strategist` |
+| Copywriting | copy, headline, CTA, ad copy | `copywriting` |
+| Quotation | estimate, quote, pricing | `quotation` |
+| Gov Support | government grant, subsidy, TIPS | `gov-support-strategist` |
+| Ads | ad optimization, ROAS | `ad-optimizer-team` |
+| Growth | marketing strategy, growth | `performance-growth-marketer` |
+| Content | content planning, YouTube | `qjc-content` |
+| CRM | sales, leads, CRM, pipeline | `crm-manager` |
+| Design | UI, UX, landing page, dashboard | `web-designer` |
+| Video | Remotion, video production | `remotion-creator` |
+| Research | research, market analysis | `researcher` |
+| AI Research | AI research, paper survey, SOTA | `ai-researcher` |
+| Storytelling | brand story, narrative, pitch deck | `storyteller` |
+
+> **Team sub-agents** (ad-compass, ad-scout-google, ad-scout-meta, action-architect, folder-hunter, mail-scout) are managed by their parent team agents and are not directly routed.
+
+### Anti-Recursion Guard
+
+Both `using-superpowers` and `agent-router` include `<SUBAGENT-STOP>` guards to prevent infinite recursion when an agent is already running inside a subagent context.
+
+### Customization
+
+Edit `commands/agent-router.md` to add your own agents to the routing table:
+
+```markdown
+| my custom keyword | my-custom-agent |
+```
+
+The router will automatically delegate matching requests to your agent.
+
+---
+
+## 🛡 Claude Code Automation Hooks
 
 ### Security Hooks
 
@@ -342,35 +485,48 @@ claude-forge/
 
 ---
 
-## 🤖 Agents
+## 🤖 Claude Code Agents
+
+Each agent has a **color** in the UI for quick visual identification:
 
 ### Opus Agents (6) -- Deep analysis & planning
 
-| Agent | Purpose |
-|:------|:--------|
-| **planner** | Implementation planning for complex features and refactoring |
-| **architect** | System design, scalability decisions, technical architecture |
-| **code-reviewer** | Quality, security, and maintainability review |
-| **security-reviewer** | OWASP Top 10, secrets, SSRF, injection detection |
-| **tdd-guide** | Test-driven development enforcement (RED → GREEN → IMPROVE) |
-| **database-reviewer** | PostgreSQL/Supabase query optimization, schema design |
+| Agent | Color | Purpose |
+|:------|:-----:|:--------|
+| **planner** | blue | Implementation planning for complex features and refactoring |
+| **architect** | blue | System design, scalability decisions, technical architecture |
+| **code-reviewer** | blue | Quality, security, and maintainability review |
+| **security-reviewer** | red | OWASP Top 10, secrets, SSRF, injection detection |
+| **tdd-guide** | cyan | Test-driven development enforcement (RED → GREEN → IMPROVE) |
+| **database-reviewer** | blue | PostgreSQL/Supabase query optimization, schema design |
 
 ### Sonnet Agents (5) -- Fast execution & automation
 
-| Agent | Purpose |
+| Agent | Color | Purpose |
+|:------|:-----:|:--------|
+| **build-error-resolver** | cyan | Fix build/TypeScript errors with minimal diffs |
+| **e2e-runner** | cyan | Generate and run Playwright E2E tests |
+| **refactor-cleaner** | yellow | Dead code cleanup using knip, depcheck, ts-prune |
+| **doc-updater** | yellow | Documentation and codemap updates |
+| **verify-agent** | cyan | Fresh-context build/lint/test verification |
+
+### Color Semantics
+
+| Color | Meaning |
 |:------|:--------|
-| **build-error-resolver** | Fix build/TypeScript errors with minimal diffs |
-| **e2e-runner** | Generate and run Playwright E2E tests |
-| **refactor-cleaner** | Dead code cleanup using knip, depcheck, ts-prune |
-| **doc-updater** | Documentation and codemap updates |
-| **verify-agent** | Fresh-context build/lint/test verification |
+| **blue** | Analysis & review |
+| **cyan** | Testing & verification |
+| **yellow** | Maintenance & data |
+| **red** | Security & critical |
+| **magenta** | Creative & research |
+| **green** | Business & success |
 
 ---
 
-## 📋 All Commands
+## 📋 All Claude Forge Commands
 
 <details>
-<summary><strong>36 Commands (click to expand)</strong></summary>
+<summary><strong>40 Commands (click to expand)</strong></summary>
 
 #### Core Workflow
 
@@ -420,7 +576,7 @@ claude-forge/
 | `/update-codemaps` | Analyze codebase and update architecture docs. |
 | `/update-docs` | Sync documentation from source-of-truth. |
 | `/sync-docs` | Sync prompt_plan.md, spec.md, CLAUDE.md + rules. |
-| `/sync` | git pull + sync-docs in sequence. |
+| `/sync` | Pull latest changes and sync all project docs (prompt_plan.md, spec.md, CLAUDE.md, rules). Use after any workflow or at session start. |
 | `/pull` | Quick `git pull origin main`. |
 
 #### Project Management
@@ -459,7 +615,7 @@ claude-forge/
 
 ---
 
-## 🧩 All Skills
+## 🧩 All Claude Forge Skills
 
 <details>
 <summary><strong>15 Skills (click to expand)</strong></summary>
@@ -481,6 +637,66 @@ claude-forge/
 | **team-orchestrator** | Agent Teams engine: team composition, task distribution, dependency management. |
 | **verification-engine** | Integrated verification engine: fresh-context subagent verification loop. |
 | **verify-implementation** | Run all project verify skills and generate unified pattern verification report. |
+
+</details>
+
+---
+
+## Frequently Asked Questions
+
+<details>
+<summary><strong>What is Claude Forge?</strong></summary>
+
+Claude Forge is an open-source development environment for Claude Code. It bundles 11 specialized agents, 40 slash commands, 15 skill workflows, 15 automation hooks, and 9 rule files into a single install. Think of it as "oh-my-zsh for Claude Code" -- it turns the basic Claude Code CLI into a fully equipped coding environment with built-in workflows for planning, TDD, security review, and deployment.
+
+</details>
+
+<details>
+<summary><strong>How is Claude Forge different from other Claude Code plugins?</strong></summary>
+
+Most Claude Code plugins solve one problem at a time. Claude Forge is a **complete development environment** -- 11 agents, 40 commands, 15 skills, 15 hooks, and 9 rules that work together as a cohesive system. Instead of assembling individual plugins and configuring each one, Claude Forge gives you a pre-wired pipeline: `/plan` feeds into `/tdd`, which feeds into `/code-review`, which feeds into `/handoff-verify`, which feeds into `/commit-push-pr`. The 6-layer security hook system also runs automatically without extra configuration.
+
+</details>
+
+<details>
+<summary><strong>Is Claude Forge compatible with the official Claude Code plugin system?</strong></summary>
+
+Yes. Claude Forge installs via symlinks to `~/.claude/` and works alongside official Claude Code plugins. Your existing `settings.local.json` overrides are preserved, and you can add or remove individual components without affecting the rest of the system.
+
+</details>
+
+<details>
+<summary><strong>How do I update Claude Forge?</strong></summary>
+
+Run `git pull` in the claude-forge directory. Because the installer uses symlinks (on macOS/Linux), updates take effect immediately -- no re-install needed. On Windows, re-run `install.ps1` after pulling to copy the updated files.
+
+</details>
+
+<details>
+<summary><strong>Does Claude Forge work on Windows?</strong></summary>
+
+Yes. Run `install.ps1` in PowerShell as Administrator. Windows uses file copies instead of symlinks, so you need to re-run `install.ps1` after each `git pull` to apply updates. All agents, commands, skills, and hooks work the same on Windows, macOS, and Linux.
+
+</details>
+
+<details>
+<summary><strong>What does /sync do?</strong></summary>
+
+`/sync` synchronizes your project's memory and documentation. It pulls the latest changes from the remote repository and then syncs all project docs -- `prompt_plan.md`, `spec.md`, `CLAUDE.md`, and rule files. Run it after completing any workflow (feature, bug fix, refactor) or at the start of a new session to ensure Claude has the latest context.
+
+</details>
+
+<details>
+<summary><strong>How does Claude Forge handle memory across sessions?</strong></summary>
+
+Claude Forge uses a 4-layer memory system:
+
+1. **Project docs** (`CLAUDE.md`, `prompt_plan.md`, `spec.md`) -- Project-level instructions and plans that persist in the repository. `/sync` keeps these up to date.
+2. **Rule files** (`rules/`) -- Coding style, security, workflow conventions loaded automatically each session.
+3. **MCP memory server** -- A persistent knowledge graph that stores entities and relations across sessions.
+4. **Agent memory** (`~/.claude/agent-memory/`) -- Core agents record learnings after each task, improving their recommendations over time through Self-Evolution.
+
+Running `/sync` at session start ensures layers 1 and 2 are current. The MCP memory server (layer 3) and agent memory (layer 4) persist automatically.
 
 </details>
 
@@ -515,6 +731,8 @@ Add this badge to your project's README to let others know you use Claude Forge.
 ## 📄 License
 
 [MIT](LICENSE) -- use it, fork it, build on it.
+
+If Claude Forge improved your workflow, a [star](https://github.com/sangrokjung/claude-forge/stargazers) helps others find it too.
 
 ---
 

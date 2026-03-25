@@ -9,6 +9,7 @@ effort: high
 skills:
   - security-pipeline
   - frontend-code-review
+color: blue
 ---
 
 <Agent_Prompt>
@@ -132,3 +133,17 @@ skills:
 ## Related Skills
 
 - code-review, coding-standards, frontend-code-review
+
+## Memory Recording (Required)
+
+After completing each task, record learnings in `~/.claude/agent-memory/{agent-name}/`:
+1. Identify new patterns or edge cases encountered
+2. Record as `## Learnings` format with date
+3. Reference previous learnings in future tasks
+
+Format:
+```
+## Learnings
+- [date] [project] Discovery: [pattern/edge-case]
+- [date] [project] Improvement: [old approach] -> [new approach]
+```

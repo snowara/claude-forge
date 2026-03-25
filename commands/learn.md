@@ -178,6 +178,26 @@ ls .claude/skills/ 2>/dev/null
 - **조치**: [취한 조치 또는 권장 사항]
 ```
 
+### Agent Memory 연동
+
+교훈이 특정 에이전트의 도메인에 해당하는 경우, 해당 에이전트의 memory에도 기록한다.
+
+| 교훈 분류 | 관련 에이전트 | Memory 경로 |
+|-----------|-------------|-------------|
+| error-pattern (빌드) | build-error-resolver | `~/.claude/agent-memory/build-error-resolver/` |
+| error-pattern (테스트) | tdd-guide | `~/.claude/agent-memory/tdd-guide/` |
+| security-pattern | security-reviewer | `~/.claude/agent-memory/security-reviewer/` |
+| performance-pattern | architect | `~/.claude/agent-memory/architect/` |
+| automation-pattern | planner | `~/.claude/agent-memory/planner/` |
+
+기록 형식 (agent-memory에 append):
+```
+## Learnings
+- [날짜] [프로젝트] 발견: [교훈 내용 요약]
+```
+
+이렇게 하면 에이전트가 다음 작업 시 관련 교훈을 자동으로 참조할 수 있다.
+
 ### --suggest 결과 기록
 
 자동화 제안이 채택된 경우:

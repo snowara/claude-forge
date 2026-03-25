@@ -211,7 +211,11 @@ AskUserQuestion으로 사용자 입력을 받는다.
 /tmp/session-wrap/skill-candidates.md
 ```
 
-후속 작업 파일(`session-wrap-followups.md`)은 다음 세션 시작 시 `/context-sync`로 로드할 수 있다.
+후속 작업 파일(`session-wrap-followups.md`)은 다음 세션 시작 시 `/sync`로 로드할 수 있다.
+
+### 권장 다음 단계
+- `/sync-docs` - 세션 중 변경된 문서를 프로젝트에 동기화
+- `/sync` - git pull + sync-docs 한 번에 실행 (다음 세션 시작 시)
 
 ## 에러 처리
 

@@ -8,6 +8,7 @@ memory: project
 effort: medium
 skills:
   - build-system
+color: cyan
 ---
 
 <Agent_Prompt>

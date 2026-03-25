@@ -1,6 +1,6 @@
 #!/bin/bash
 # context-sync-suggest.sh - SessionStart Hook
-# 마지막 세션 종료 후 일정 시간이 경과했으면 /context-sync 안내
+# 마지막 세션 종료 후 일정 시간이 경과했으면 /sync 안내
 # OMC session-start.mjs, project-memory-session.mjs와 독립 공존
 # exit 0 필수
 
@@ -51,7 +51,7 @@ except:
     sys.exit(0)
 
 gap_display = f'{int(gap_hours)}시간' if gap_hours < 48 else f'{int(gap_hours/24)}일'
-print(f'[Context Sync] 마지막 세션 이후 {gap_display} 경과. /context-sync로 놓친 활동을 확인하세요.')
+print(f'[Context Sync] 마지막 세션 이후 {gap_display} 경과. /sync로 놓친 활동을 확인하세요.')
 " 2>/dev/null)
 
 if [[ -n "$MSG" ]]; then

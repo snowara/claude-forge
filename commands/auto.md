@@ -38,7 +38,7 @@ $ARGUMENTS에서 옵션을 추출한다:
 ### feature 모드 (기본)
 
 ```
-plan -> tdd -> code-review -> handoff-verify -> commit-push-pr
+plan -> tdd -> code-review -> handoff-verify -> commit-push-pr -> sync-docs
 ```
 
 1. **plan**: 구현 계획 수립. 사용자 확인 없이 자동 확정.
@@ -46,28 +46,31 @@ plan -> tdd -> code-review -> handoff-verify -> commit-push-pr
 3. **code-review**: 작성한 코드의 보안 + 품질 검사. CRITICAL/HIGH 이슈는 자동 수정.
 4. **handoff-verify**: 빌드/테스트/린트 자동 검증. 실패 시 자동 수정 후 재검증 (최대 5회).
 5. **commit-push-pr**: 커밋 메시지 자동 생성, 푸시, PR 생성.
+6. **sync-docs**: 프로젝트 문서 동기화 (prompt_plan.md, spec.md, CLAUDE.md, rules).
 
 ### bugfix 모드
 
 ```
-explore -> tdd -> handoff-verify -> quick-commit
+explore -> tdd -> handoff-verify -> quick-commit -> sync-docs
 ```
 
 1. **explore**: 관련 코드 탐색으로 버그 원인 파악.
 2. **tdd**: 버그를 재현하는 테스트 작성 후 수정.
 3. **handoff-verify**: 빌드/테스트 검증 (--once 모드).
 4. **quick-commit**: 자동 생성된 커밋 메시지로 빠른 커밋 + 푸시.
+5. **sync-docs**: 프로젝트 문서 동기화.
 
 ### refactor 모드
 
 ```
-refactor-clean -> code-review -> handoff-verify -> commit-push-pr
+refactor-clean -> code-review -> handoff-verify -> commit-push-pr -> sync-docs
 ```
 
 1. **refactor-clean**: 사용하지 않는 코드, 중복 제거, 구조 개선.
 2. **code-review**: 리팩토링 결과 검사.
 3. **handoff-verify**: 기존 기능이 깨지지 않았는지 검증.
 4. **commit-push-pr**: 커밋 + PR (--squash 권장).
+5. **sync-docs**: 프로젝트 문서 동기화.
 
 ---
 
@@ -128,6 +131,7 @@ ultrawork 모드를 사용하여 중간에 멈추지 않는다.
     [3] Code Review  DONE   CRITICAL 0 / HIGH 0
     [4] Verify       PASS   빌드+테스트+린트 통과
     [5] Commit & PR  DONE   PR #[번호]: [URL]
+    [6] Sync Docs    DONE   문서 동기화 완료
 
 ======================================================================
 ```
@@ -147,6 +151,7 @@ ultrawork 모드를 사용하여 중간에 멈추지 않는다.
     [3] Code Review  WARN   HIGH 2건 (자동 수정됨)
     [4] Verify       FAIL   테스트 2개 실패
     [5] Commit & PR  SKIP   (검증 실패로 스킵)
+    [6] Sync Docs    SKIP   (커밋 실패로 스킵)
 
   실패 상세:
     - src/auth.ts:45 - 타입 불일치 (자동 수정 실패)

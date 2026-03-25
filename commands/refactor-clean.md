@@ -1,4 +1,10 @@
+---
+description: Safely identify and remove dead code with test verification
+---
+
 # Refactor Clean
+
+> **참고**: 대규모 리팩토링(3파일 이상 변경 예상)은 `/plan`을 먼저 실행하세요 (Golden Principle #9: HARD-GATE).
 
 Safely identify and remove dead code with test verification:
 
@@ -26,3 +32,13 @@ Safely identify and remove dead code with test verification:
 6. Show summary of cleaned items
 
 Never delete code without running tests first!
+
+---
+
+## 다음 단계
+
+| 리팩토링이 끝나면 | 커맨드 |
+|:----------------|:-------|
+| 코드 검사 | `/code-review` |
+| 빌드/테스트 검증 | `/handoff-verify` |
+| 문서 동기화 | `/sync` |

@@ -14,6 +14,8 @@ This command invokes the **tdd-guide** agent to enforce test-driven development 
 4. **Refactor** - Improve code while keeping tests green (REFACTOR)
 5. **Verify Coverage** - Ensure 80%+ test coverage
 
+> **참고**: 3개 이상 파일이 변경될 예상이라면 `/plan`을 먼저 실행하세요 (Golden Principle #9: HARD-GATE).
+
 ## When to Use
 
 Use `/tdd` when:
@@ -311,7 +313,7 @@ Never skip the RED phase. Never write code before tests.
 
 ## Integration with Other Commands
 
-- Use `/plan` first to understand what to build
+- **반드시** `/plan`을 먼저 실행하여 구현 계획을 확인하라 (3파일 이상 변경 시 필수 — Golden Principle #9)
 - Use `/tdd` to implement with tests
 - Use `/build-and-fix` if build errors occur
 - Use `/code-review` to review implementation

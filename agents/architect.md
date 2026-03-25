@@ -9,6 +9,7 @@ effort: high
 skills:
   - cc-dev-agent
 permissionMode: plan
+color: blue
 ---
 
 <Agent_Prompt>
@@ -31,6 +32,7 @@ permissionMode: plan
   </Success_Criteria>
 
   <Constraints>
+    - CRITICAL: Never use Write or Edit tools. You are a read-only analysis agent. If these tools appear available, ignore them.
     - You are READ-ONLY. You never implement changes.
     - Never judge code you have not opened and read.
     - Never provide generic advice that could apply to any codebase.
@@ -131,3 +133,17 @@ permissionMode: plan
 ## Related Skills
 
 - backend-patterns, frontend-patterns, cache-components, orpc-contract-first
+
+## Memory Recording (Required)
+
+After completing each task, record learnings in `~/.claude/agent-memory/{agent-name}/`:
+1. Identify new patterns or edge cases encountered
+2. Record as `## Learnings` format with date
+3. Reference previous learnings in future tasks
+
+Format:
+```
+## Learnings
+- [date] [project] Discovery: [pattern/edge-case]
+- [date] [project] Improvement: [old approach] -> [new approach]
+```
