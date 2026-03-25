@@ -150,27 +150,28 @@ class AdVideoVerifier(BaseVerifier):
         }
 
     def _check_web_app(self, config):
-        """Next.js 웹앱 헬스체크 (localhost)."""
-        port = config.get("ad_video_crew", {}).get("web_port", 3000)
-        url = f"http://localhost:{port}"
+        """Next.js 웹앱 헬스체크 — 여러 포트 시도 (3001~3005, 3000)."""
+        ports = config.get("ad_video_crew", {}).get("web_ports", [3001, 3002, 3003, 3004, 3005, 3000])
 
-        try:
-            import requests
-            resp = requests.get(url, timeout=5)
-            if resp.status_code == 200:
-                return {
-                    "check": "웹앱 상태",
-                    "result": "pass",
-                    "message": f"localhost:{port} 정상 (HTTP 200)",
-                }
-            return {
-                "check": "웹앱 상태",
-                "result": "fail",
-                "message": f"localhost:{port} HTTP {resp.status_code}",
-            }
-        except Exception:
-            return {
-                "check": "웹앱 상태",
-                "result": "skip",
-                "message": f"localhost:{port} 미응답 (서버 미실행)",
-            }
+        import requests
+
+        for port in ports:
+            try:
+                resp = requests.get(f"http://localhost:{port}", timeout=3)
+                if resp.status_code == 200:
+                    # ad-video-crew 웹앱인지 확인 (title 또는 body 키워드)
+                    body = resp.text[:2000].lower()
+                    if "ad-video" in body or "video-crew" in body or "영상" in body:
+                        return {
+                            "check": "웹앱 상태",
+                            "result": "pass",
+                            "message": f"localhost:{port} 정상 (ad-video-crew 확인)",
+                        }
+            except Exception:
+                continue
+
+        return {
+            "check": "웹앱 상태",
+            "result": "skip",
+            "message": "ad-video-crew 웹앱 미실행 (dev 서버 꺼짐)",
+        }

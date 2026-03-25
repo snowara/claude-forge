@@ -19,7 +19,7 @@
     "backoff_seconds": 5
   },
   "ad_video_crew": {
-    "web_port": 3000,
+    "web_ports": [3001, 3002, 3003, 3004, 3005, 3000],
     "min_video_size_kb": 100
   }
 }
