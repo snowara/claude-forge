@@ -1,0 +1,20 @@
+{
+  "email_to": "snowara@snowara.com",
+  "notify_on": ["fail", "error", "not_run"],
+  "thresholds": {
+    "blog_block_ratio_min": 0.7,
+    "session_expiry_warning_hours": 24,
+    "finder_min_daily_count": 1
+  },
+  "targets": {
+    "blog-writer": {"enabled": true},
+    "daangn-biz": {"enabled": true},
+    "product-finder": {"enabled": true},
+    "session": {"enabled": true}
+  },
+  "fetch": {
+    "timeout_seconds": 15,
+    "max_retries": 2,
+    "backoff_seconds": 5
+  }
+}
