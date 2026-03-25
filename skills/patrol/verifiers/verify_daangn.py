@@ -7,7 +7,10 @@ from datetime import datetime
 from pathlib import Path
 
 from .base import BaseVerifier
-from ..patrol_config import PATHS
+try:
+    from ..patrol_config import PATHS
+except ImportError:
+    from patrol_config import PATHS
 
 
 class DaangnVerifier(BaseVerifier):
