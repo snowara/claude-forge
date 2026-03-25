@@ -5,6 +5,9 @@ description: Software architecture specialist for system design, scalability, an
 tools: ["Read", "Grep", "Glob"]
 model: opus
 memory: project
+effort: high
+skills:
+  - cc-dev-agent
 permissionMode: plan
 ---
 

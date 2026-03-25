@@ -5,6 +5,9 @@ description: Expert planning specialist for complex features and refactoring. Us
 tools: ["Read", "Grep", "Glob"]
 model: opus
 memory: project
+effort: high
+skills:
+  - cc-dev-agent
 permissionMode: plan
 ---
 

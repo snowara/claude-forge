@@ -5,6 +5,9 @@ description: 자동화 파이프라인 산출물 검증 실패 시 원인 분석
 tools: ["Read", "Bash", "Grep", "Glob"]
 model: sonnet
 memory: project
+effort: medium
+skills:
+  - patrol
 ---
 
 <Agent_Prompt>

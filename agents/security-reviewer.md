@@ -5,6 +5,9 @@ description: Security vulnerability detection and remediation specialist. Use PR
 tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 model: opus
 memory: project
+effort: max
+skills:
+  - security-pipeline
 ---
 
 <Agent_Prompt>

@@ -5,6 +5,10 @@ description: Expert code review specialist. Proactively reviews code for quality
 tools: ["Read", "Grep", "Glob", "Bash"]
 model: opus
 memory: project
+effort: high
+skills:
+  - security-pipeline
+  - frontend-code-review
 ---
 
 <Agent_Prompt>

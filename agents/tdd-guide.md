@@ -5,6 +5,9 @@ description: Test-Driven Development specialist enforcing write-tests-first meth
 tools: ["Read", "Write", "Edit", "Bash", "Grep"]
 model: opus
 memory: project
+effort: high
+skills:
+  - eval-harness
 ---
 
 <Agent_Prompt>
