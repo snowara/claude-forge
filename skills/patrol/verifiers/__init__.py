@@ -28,3 +28,9 @@ try:
     VERIFIERS['session'] = SessionVerifier
 except ImportError:
     pass
+
+try:
+    from .verify_advideo import AdVideoVerifier
+    VERIFIERS['ad-video-crew'] = AdVideoVerifier
+except ImportError:
+    pass

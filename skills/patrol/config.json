@@ -10,11 +10,16 @@
     "blog-writer": {"enabled": true},
     "daangn-biz": {"enabled": true},
     "product-finder": {"enabled": true},
-    "session": {"enabled": true}
+    "session": {"enabled": true},
+    "ad-video-crew": {"enabled": true}
   },
   "fetch": {
     "timeout_seconds": 15,
     "max_retries": 2,
     "backoff_seconds": 5
+  },
+  "ad_video_crew": {
+    "web_port": 3000,
+    "min_video_size_kb": 100
   }
 }

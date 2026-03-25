@@ -16,6 +16,7 @@ PATHS = {
     'blog-writer': Path.home() / 'e-commerce' / 'automation' / 'blog-writer',
     'daangn-biz': Path.home() / 'e-commerce' / 'automation' / 'daangn-biz',
     'product-finder': Path.home() / 'e-commerce' / 'automation' / 'product-finder',
+    'ad-video-crew': Path.home() / 'e-commerce' / 'automation' / 'ad-video-crew',
 }
 
 # .env 로드
@@ -41,6 +42,7 @@ def _default_config():
             'daangn-biz': {'enabled': True},
             'product-finder': {'enabled': True},
             'session': {'enabled': True},
+            'ad-video-crew': {'enabled': True},
         },
         'fetch': {
             'timeout_seconds': 15,
